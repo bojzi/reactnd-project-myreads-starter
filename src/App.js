@@ -24,7 +24,10 @@ class BooksApp extends React.Component {
                 )}/>
 
                 <Route exact path="/" render={() => (
-                    <BookList books={this.state.books}/>
+                    <BookList books={this.state.books}
+                              onShelfChange={(book, shelf) => {
+                                  BooksAPI.update(book, shelf);
+                              }}/>
                 )}/>
             </div>
         )

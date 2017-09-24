@@ -7,6 +7,11 @@ class BookList extends React.Component {
         books: PropTypes.array.isRequired
     };
 
+    handleShelfChange(book, e) {
+        if (this.props.onShelfChange)
+            this.props.onShelfChange(book, e.target.value);
+    }
+
     getShelfName(shelfId) {
         switch (shelfId) {
             case 'currentlyReading':
@@ -51,7 +56,7 @@ class BookList extends React.Component {
                                                         <img className="book-cover" src={book.imageLinks.thumbnail}
                                                              alt={book.title}/>
                                                         <div className="book-shelf-changer">
-                                                            <select>
+                                                            <select onChange={(e) => this.handleShelfChange(book, e)}>
                                                                 <option value="none" disabled>Move to...</option>
                                                                 <option value="currentlyReading">Currently Reading
                                                                 </option>
