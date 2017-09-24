@@ -16,6 +16,18 @@ class BooksApp extends React.Component {
         });
     }
 
+    shelfChanged = (book, shelf) => {
+        BooksAPI.update(book.id, shelf)
+            .then(res => {
+                let books = this.state.books;
+                books.find(bookToFind => bookToFind.id === book.id).shelf = shelf;
+                this.setState({books});
+            })
+            .catch(err => {
+                alert('Something went wrong while changing book shelf. Please try again.')
+            });
+    };
+
     render() {
         return (
             <div className="app">
@@ -25,9 +37,7 @@ class BooksApp extends React.Component {
 
                 <Route exact path="/" render={() => (
                     <BookList books={this.state.books}
-                              onShelfChange={(book, shelf) => {
-                                  BooksAPI.update(book, shelf);
-                              }}/>
+                              onShelfChange={this.shelfChanged}/>
                 )}/>
             </div>
         )

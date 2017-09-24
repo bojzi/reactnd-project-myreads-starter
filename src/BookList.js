@@ -7,6 +7,10 @@ class BookList extends React.Component {
         books: PropTypes.array.isRequired
     };
 
+    state = {
+        shelves: {}
+    };
+
     handleShelfChange(book, e) {
         if (this.props.onShelfChange)
             this.props.onShelfChange(book, e.target.value);
@@ -25,8 +29,8 @@ class BookList extends React.Component {
         }
     }
 
-    render() {
-        let booksByCategory = this.props.books.reduce((acc, book) => {
+    componentWillReceiveProps(nextProps) {
+        let booksByCategory = nextProps.books.reduce((acc, book) => {
             if (acc[book.shelf]) {
                 acc[book.shelf].push(book);
             }
@@ -37,6 +41,14 @@ class BookList extends React.Component {
             return acc;
         }, []);
 
+        this.setState({
+            shelves: booksByCategory
+        });
+    }
+
+    render() {
+
+
         return (
             <div className="list-books">
                 <div className="list-books-title">
@@ -44,19 +56,20 @@ class BookList extends React.Component {
                 </div>
                 <div className="list-books-content">
                     <div>
-                        {Object.entries(booksByCategory).map((bookCategory) => (
-                            <div key={bookCategory[0]} className="bookshelf">
-                                <h2 className="bookshelf-title">{this.getShelfName(bookCategory[0])}</h2>
+                        {Object.entries(this.state.shelves).map((shelf) => (
+                            <div key={shelf[0]} className="bookshelf">
+                                <h2 className="bookshelf-title">{this.getShelfName(shelf[0])}</h2>
                                 <div className="bookshelf-books">
                                     <ol className="books-grid">
-                                        {bookCategory[1].map((book) => (
-                                            <li key={book.industryIdentifiers.filter(id => id.type === 'ISBN_13')[0].identifier}>
+                                        {shelf[1].map((book) => (
+                                            <li key={book.id}>
                                                 <div className="book">
                                                     <div className="book-top">
                                                         <img className="book-cover" src={book.imageLinks.thumbnail}
                                                              alt={book.title}/>
                                                         <div className="book-shelf-changer">
-                                                            <select onChange={(e) => this.handleShelfChange(book, e)}>
+                                                            <select onChange={(e) => this.handleShelfChange(book, e)}
+                                                                    value={book.shelf}>
                                                                 <option value="none" disabled>Move to...</option>
                                                                 <option value="currentlyReading">Currently Reading
                                                                 </option>
