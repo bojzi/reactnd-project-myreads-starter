@@ -17,14 +17,22 @@ class BooksApp extends React.Component {
     }
 
     shelfChanged = (book, shelf) => {
-        BooksAPI.update(book.id, shelf)
+        BooksAPI.update(book, shelf)
             .then(res => {
                 let books = this.state.books;
-                books.find(bookToFind => bookToFind.id === book.id).shelf = shelf;
+                let bookFound = books.find(bookToFind => bookToFind.id === book.id);
+                if (bookFound) {
+                    bookFound.shelf = shelf;
+                }
+                else {
+                    book.shelf = shelf;
+                    books.push(book);
+                }
+
                 this.setState({books});
             })
             .catch(err => {
-                alert('Something went wrong while changing book shelf. Please try again.')
+                alert('Something went wrong while changing book shelf. Error: ' + err)
             });
     };
 
@@ -32,7 +40,8 @@ class BooksApp extends React.Component {
         return (
             <div className="app">
                 <Route path="/search" render={() => (
-                    <Search/>
+                    <Search books={this.state.books}
+                            onShelfChange={this.shelfChanged}/>
                 )}/>
 
                 <Route exact path="/" render={() => (
@@ -44,4 +53,4 @@ class BooksApp extends React.Component {
     }
 }
 
-export default BooksApp
+export default BooksApp;

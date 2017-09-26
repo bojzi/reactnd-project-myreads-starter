@@ -1,19 +1,29 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import BookEntry from './BookEntry';
 
 class BookList extends React.Component {
     static propTypes = {
-        books: PropTypes.array.isRequired
+        books: PropTypes.array.isRequired,
+        onShelfChange: PropTypes.func.isRequired
     };
 
     state = {
         shelves: {}
     };
 
-    handleShelfChange(book, e) {
+    handleShelfChange = (book, e) => {
         if (this.props.onShelfChange)
             this.props.onShelfChange(book, e.target.value);
+    };
+
+    componentDidMount() {
+        this.filterBooksByShelves(this.props.books);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.filterBooksByShelves(nextProps.books);
     }
 
     getShelfName(shelfId) {
@@ -29,8 +39,8 @@ class BookList extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        let booksByCategory = nextProps.books.reduce((acc, book) => {
+    filterBooksByShelves(books) {
+        let booksByShelves = books.reduce((acc, book) => {
             if (acc[book.shelf]) {
                 acc[book.shelf].push(book);
             }
@@ -42,13 +52,11 @@ class BookList extends React.Component {
         }, []);
 
         this.setState({
-            shelves: booksByCategory
+            shelves: booksByShelves
         });
     }
 
     render() {
-
-
         return (
             <div className="list-books">
                 <div className="list-books-title">
@@ -62,27 +70,10 @@ class BookList extends React.Component {
                                 <div className="bookshelf-books">
                                     <ol className="books-grid">
                                         {shelf[1].map((book) => (
-                                            <li key={book.id}>
-                                                <div className="book">
-                                                    <div className="book-top">
-                                                        <img className="book-cover" src={book.imageLinks.thumbnail}
-                                                             alt={book.title}/>
-                                                        <div className="book-shelf-changer">
-                                                            <select onChange={(e) => this.handleShelfChange(book, e)}
-                                                                    value={book.shelf}>
-                                                                <option value="none" disabled>Move to...</option>
-                                                                <option value="currentlyReading">Currently Reading
-                                                                </option>
-                                                                <option value="wantToRead">Want to Read</option>
-                                                                <option value="read">Read</option>
-                                                                <option value="none">None</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div className="book-title">{book.title}</div>
-                                                    <div className="book-authors">{book.authors.join(', ')}</div>
-                                                </div>
-                                            </li>
+                                            <BookEntry
+                                                key={book.id}
+                                                book={book}
+                                                onShelfChanged={this.handleShelfChange} />
                                         ))}
                                     </ol>
                                 </div>
