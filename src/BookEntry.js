@@ -14,7 +14,7 @@ class BookEntry extends React.Component {
             <li>
                 <div className="book">
                     <div className="book-top">
-                        <img className="book-cover" src={book.imageLinks.thumbnail}
+                        <img className="book-cover" src={book.imageLinks ? book.imageLinks.thumbnail : './icons/book-placeholder.jpg'}
                              alt={book.title}/>
                         <div className="book-shelf-changer">
                             <select onChange={(e) => onShelfChanged(book, e)}

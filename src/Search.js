@@ -11,6 +11,7 @@ class Search extends React.Component {
     };
 
     state = {
+        error: '',
         searchedBooks: []
     };
 
@@ -24,15 +25,22 @@ class Search extends React.Component {
     };
 
     handleSearch = (e) => {
+        this.setState({error: ''});
         BooksAPI.search(e.target.value, 20)
             .then((data) => {
-                this.setBooksAlreadyInShelves(this.props.books, data);
-                let knownBookIds = this.props.books.map(book => book.id);
-                let unknownBooks = data.filter(book => !knownBookIds.includes(book.id));
-                this.setState({searchedBooks: unknownBooks});
+                if (data.error) {
+
+                }
+                else if (data) {
+                    this.setBooksAlreadyInShelves(this.props.books, data);
+                    let knownBookIds = this.props.books.map(book => book.id);
+                    let unknownBooks = data.filter(book => !knownBookIds.includes(book.id));
+                    this.setState({searchedBooks: unknownBooks});
+                }
             })
             .catch((err) => {
-                alert('There was an error while searching. Error: ' + err);
+                this.setState({error: err.toString(), searchedBooks: []});
+                console.log('There was an error while searching. Error: ' + err);
             });
     };
 
@@ -52,6 +60,12 @@ class Search extends React.Component {
                     </div>
                 </div>
                 <div className="search-books-results">
+                    { this.state.error && (
+                        <p>There was an error: {this.state.error}</p>
+                    )}
+                    { this.state.searchedBooks.length === 0 && !this.state.error && (
+                        <p>There are no results.</p>
+                    )}
                     <ol className="books-grid">
                         {this.state.searchedBooks.map((book) => (
                             <BookEntry

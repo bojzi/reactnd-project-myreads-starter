@@ -21,18 +21,28 @@ class BooksApp extends React.Component {
             .then(res => {
                 let books = this.state.books;
                 let bookFound = books.find(bookToFind => bookToFind.id === book.id);
+                // Book already in collection, probably just a change of shelves
                 if (bookFound) {
-                    bookFound.shelf = shelf;
+                    // None removes book from collection
+                    if (shelf === 'none') {
+                        books = books.filter(book => book.id !== bookFound.id);
+                    }
+                    else {
+                        bookFound.shelf = shelf;
+                    }
                 }
+                // New book, probably adding to collection
                 else {
-                    book.shelf = shelf;
-                    books.push(book);
+                    if (shelf !== 'none') {
+                        book.shelf = shelf;
+                        books.push(book);
+                    }
                 }
 
                 this.setState({books});
             })
             .catch(err => {
-                alert('Something went wrong while changing book shelf. Error: ' + err)
+                console.log('Something went wrong while changing book shelf. Error: ' + err)
             });
     };
 
