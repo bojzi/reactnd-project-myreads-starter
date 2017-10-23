@@ -16,7 +16,7 @@ class Search extends React.Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        this.setBooksAlreadyInShelves(nextProps.books, this.state.searchedBooks);
+        this.setBookShelves(nextProps.books, this.state.searchedBooks);
     }
 
     handleShelfChange = (book, e) => {
@@ -32,10 +32,7 @@ class Search extends React.Component {
 
                 }
                 else if (data) {
-                    this.setBooksAlreadyInShelves(this.props.books, data);
-                    let knownBookIds = this.props.books.map(book => book.id);
-                    let unknownBooks = data.filter(book => !knownBookIds.includes(book.id));
-                    this.setState({searchedBooks: unknownBooks});
+                    this.setBookShelves(this.props.books, data);
                 }
             })
             .catch((err) => {
@@ -44,10 +41,17 @@ class Search extends React.Component {
             });
     };
 
-    setBooksAlreadyInShelves(knownBooks, searchedbooks) {
-        let knownBookIds = knownBooks.map(book => book.id);
-        let unknownBooks = searchedbooks.filter(book => !knownBookIds.includes(book.id));
-        this.setState({searchedBooks: unknownBooks});
+    setBookShelves(booksInLibrary, searchedBooks) {
+        const newBookShelves = searchedBooks.map((book) => {
+            let knownBook = booksInLibrary.find(bookInLibrary => bookInLibrary.id === book.id);
+            if (knownBook) {
+                book.shelf = knownBook.shelf;
+            }
+
+            return book;
+        });
+
+        this.setState({searchedBooks: newBookShelves});
     }
 
     render() {

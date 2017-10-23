@@ -10,7 +10,9 @@ class BookList extends React.Component {
     };
 
     state = {
-        shelves: {}
+        currentlyReading: [],
+        wantToRead: [],
+        read: []
     };
 
     handleShelfChange = (book, e) => {
@@ -26,33 +28,11 @@ class BookList extends React.Component {
         this.filterBooksByShelves(nextProps.books);
     }
 
-    getShelfName(shelfId) {
-        switch (shelfId) {
-            case 'currentlyReading':
-                return 'Currently Reading';
-            case 'wantToRead':
-                return 'Want to Read';
-            case 'read':
-                return 'Read';
-            default:
-                return 'Unknown shelf';
-        }
-    }
-
     filterBooksByShelves(books) {
-        let booksByShelves = books.reduce((acc, book) => {
-            if (acc[book.shelf]) {
-                acc[book.shelf].push(book);
-            }
-            else {
-                acc[book.shelf] = [book];
-            }
-
-            return acc;
-        }, []);
-
         this.setState({
-            shelves: booksByShelves
+            currentlyReading: books.filter(book => book.shelf === 'currentlyReading'),
+            wantToRead: books.filter(book => book.shelf === 'wantToRead'),
+            read: books.filter(book => book.shelf === 'read')
         });
     }
 
@@ -64,21 +44,54 @@ class BookList extends React.Component {
                 </div>
                 <div className="list-books-content">
                     <div>
-                        {Object.entries(this.state.shelves).map((shelf) => (
-                            <div key={shelf[0]} className="bookshelf">
-                                <h2 className="bookshelf-title">{this.getShelfName(shelf[0])}</h2>
+                        {
+                            this.state.currentlyReading.length > 0 &&
+                            <div className="bookshelf">
+                                <h2 className="bookshelf-title">Currently reading</h2>
                                 <div className="bookshelf-books">
                                     <ol className="books-grid">
-                                        {shelf[1].map((book) => (
+                                        {this.state.currentlyReading.map((book) => (
                                             <BookEntry
                                                 key={book.id}
                                                 book={book}
-                                                onShelfChanged={this.handleShelfChange} />
+                                                onShelfChanged={this.handleShelfChange}/>
                                         ))}
                                     </ol>
                                 </div>
                             </div>
-                        ))}
+                        }
+                        {
+                            this.state.wantToRead.length > 0 &&
+                            <div className="bookshelf">
+                                <h2 className="bookshelf-title">Want to read</h2>
+                                <div className="bookshelf-books">
+                                    <ol className="books-grid">
+                                        {this.state.wantToRead.map((book) => (
+                                            <BookEntry
+                                                key={book.id}
+                                                book={book}
+                                                onShelfChanged={this.handleShelfChange}/>
+                                        ))}
+                                    </ol>
+                                </div>
+                            </div>
+                        }
+                        {
+                            this.state.read.length > 0 &&
+                            <div className="bookshelf">
+                                <h2 className="bookshelf-title">Read</h2>
+                                <div className="bookshelf-books">
+                                    <ol className="books-grid">
+                                        {this.state.read.map((book) => (
+                                            <BookEntry
+                                                key={book.id}
+                                                book={book}
+                                                onShelfChanged={this.handleShelfChange}/>
+                                        ))}
+                                    </ol>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div className="open-search">
